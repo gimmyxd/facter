@@ -231,6 +231,7 @@ namespace facter { namespace facts { namespace linux {
             { string(os::amazon),                   string(os_family::redhat) },
             { string(os::xen_server),               string(os_family::redhat) },
             { string(os::xcp_ng),                   string(os_family::redhat) },
+            { string(os::virtuozzo_linux),          string(os_family::redhat) },
             { string(os::photon_os),                string(os_family::redhat) },
             { string(os::huawei),                   string(os_family::debian) },
             { string(os::linux_mint),               string(os_family::debian) },
