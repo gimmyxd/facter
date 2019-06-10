@@ -269,6 +269,7 @@ namespace facter { namespace facts { namespace linux {
                 { string(os::psbm),                     string(release_file::redhat) },
                 { string(os::xen_server),               string(release_file::redhat) },
                 { string(os::xcp_ng),                   string(release_file::redhat) },
+                { string(os::virtuozzo_linux),          string(release_file::redhat) },
                 { string(os::fedora),                   string(release_file::fedora) },
                 { string(os::meego),                    string(release_file::meego) },
                 { string(os::oracle_linux),             string(release_file::oracle_linux) },
