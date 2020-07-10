@@ -57,3 +57,7 @@ Gemfile.lock
 Gemfile.local
 acceptance/vendor
 .beaker
+benchmarks/output/*
+
+# exception to the rule
+!benchmarks/output/.gitkeep
