@@ -1,54 +1,16 @@
 ---
-name: Checks
+name: Action
 
-on:
-  push:
-    branches:
-      - 4.x
-  pull_request:
-    branches:
-      - 4.x
+on: [pull_request]
 
 jobs:
-  rubocop_checks:
-    runs-on: ubuntu-18.04
-    name: RuboCop
-    steps:
-      - name: Checkout current PR
-        uses: actions/checkout@v2
 
-      - name: Rubocop checks
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.6
-      - run: bundle install --jobs 3 --retry 3
-      - run: bundle exec rubocop --parallel
-
-  rtc:
+  jira_labeler:
     runs-on: ubuntu-latest
-    name: RuboCop TODO
+    name: Jira labeler
     steps:
       - uses: actions/checkout@v1
-      - uses: gimmyxd/rtc-action@0.2.1
-        env:
-          RTC_TOKEN: ${{ secrets.RTC_TOKEN }}
-          UPDATE_PR: false
-
-          # forces the job to fail if there are any new offences
-          FORCE_ERROR_EXIT: true
-
-  commit_checks:
-    runs-on: ubuntu-18.04
-    name: commit message
-    steps:
-      - name: Checkout current PR
-        uses: actions/checkout@v2
+      - uses: gimmyxd/jira_labeler@main
         with:
-          fetch-depth: 2
-
-      - name: Commit message checks
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.6
-      - run: bundle install --jobs 3 --retry 3
-      - run: bundle exec rake commits
+          repo_token: "${{ secrets.G_TOKEN }}"
+          jira_url: "https://tickets.puppetlabs.com:443"

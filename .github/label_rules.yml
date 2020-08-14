@@ -1,0 +1,8 @@
+---
+default: maintenance
+feature:
+  issue_type: ['Task', 'New Feature', 'Epic']
+bugfix:
+  issue_type: ['Bug']
+maintenance:
+  keywords: ['maint', 'docs', 'release']
