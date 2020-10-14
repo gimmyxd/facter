@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
+require 'facter/os_config'
+
 module Facter
   class OsHierarchy
     def initialize
       @log = Log.new(self)
-      json_file_path = File.join(File.dirname(__FILE__), '../../os_hierarchy.json')
-      json_file = Util::FileHelper.safe_read(json_file_path)
       begin
-        @json_os_hierarchy = JSON.parse(json_file)
+        @json_os_hierarchy = OsConfig::HIERARCHY
       rescue JSON::ParserError => _e
         @log.error('Could not parse os_hierarchy json')
       end
