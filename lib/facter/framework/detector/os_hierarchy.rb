@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'facter/os_config'
+require 'facter/config'
 
 module Facter
   class OsHierarchy
     def initialize
       @log = Log.new(self)
       begin
-        @json_os_hierarchy = OsConfig::HIERARCHY
+        @json_os_hierarchy = Facter::Config::HIERARCHY
       rescue JSON::ParserError => _e
         @log.error('Could not parse os_hierarchy json')
       end
