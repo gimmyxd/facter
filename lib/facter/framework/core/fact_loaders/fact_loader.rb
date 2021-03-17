@@ -34,10 +34,10 @@ module Facter
       if user_query || options[:show_legacy]
         # if we have a user query, then we must search in core facts and legacy facts
         @log.debug('Loading all internal facts')
-        internal_facts = @internal_loader.facts(options[:user_query])
+        internal_facts = @internal_loader.facts(user_query)
       else
         @log.debug('Load only core facts')
-        internal_facts = @internal_loader.core_facts(options[:user_query])
+        internal_facts = @internal_loader.core_facts(user_query)
       end
 
       block_facts(internal_facts, options)
@@ -87,6 +87,8 @@ module Facter
 
       facts.reject! { |fact| fact.type == :legacy } if options[:block_list]&.include?('legacy')
 
+      return facts if blocked_facts.empty?
+
       reject_list_core, reject_list_legacy = construct_reject_lists(blocked_facts, facts)
 
       facts = facts.reject do |fact|
@@ -102,15 +104,19 @@ module Facter
       reject_list_core = []
       reject_list_legacy = []
 
-      blocked_facts.each do |blocked|
-        facts.each do |fact|
-          next unless fact.name =~ /^#{blocked}\..*|^#{blocked}$/
+      # matches fact_name.
+      start_matcher = blocked_facts.map { |e| "^#{e}\\." }.join('|')
+      # matches the full fact_name
+      full_matcher = blocked_facts.map { |e| "^#{e}$" }.join('|')
 
-          if fact.type == :core
-            reject_list_core << fact
-          else
-            reject_list_legacy << fact
-          end
+      facts.each do |fact|
+        fact_name = fact.name
+        next unless  fact_name.start_with?(/#{start_matcher}/) || fact_name =~ /#{full_matcher}/
+
+        if fact.type == :core
+          reject_list_core << fact
+        else
+          reject_list_legacy << fact
         end
       end
 

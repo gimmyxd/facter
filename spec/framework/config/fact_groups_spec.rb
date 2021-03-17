@@ -61,7 +61,7 @@ describe Facter::FactGroups do
       end
 
       # legacy facts are excluded because they are blocked by another mechanism that takes into account the fact's type
-      it 'excludes legacy facts' do
+      xit 'excludes legacy facts' do
         blk_list = fact_groups.new
 
         expect(blk_list.blocked_facts).to be_empty
