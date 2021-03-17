@@ -34,10 +34,10 @@ module Facter
       if user_query || options[:show_legacy]
         # if we have a user query, then we must search in core facts and legacy facts
         @log.debug('Loading all internal facts')
-        internal_facts = @internal_loader.facts
+        internal_facts = @internal_loader.facts(options[:user_query])
       else
         @log.debug('Load only core facts')
-        internal_facts = @internal_loader.core_facts
+        internal_facts = @internal_loader.core_facts(options[:user_query])
       end
 
       block_facts(internal_facts, options)

@@ -2,37 +2,49 @@
 
 module Facter
   class InternalFactLoader
-    attr_reader :facts
 
-    def core_facts
+    def core_facts(user_query = nil)
+      load_facts(user_query)
       @facts.select { |fact| fact.type == :core }
     end
 
-    def legacy_facts
+    def legacy_facts(user_query = nil)
+      load_facts(user_query)
       @facts.select { |fact| fact.type == :legacy }
+    end
+
+    def facts(user_query = nil)
+      load_facts(user_query)
+      @facts
     end
 
     def initialize(os_descendents = nil)
       @facts = []
-
-      os_descendents ||= OsDetector.instance.hierarchy
-      load_all_oses_in_descending_order(os_descendents)
+      @os_descendents ||= OsDetector.instance.hierarchy
     end
+
 
     private
 
-    def load_all_oses_in_descending_order(os_descendents)
+     def load_facts(user_query)
+      load_all_oses_in_descending_order(@os_descendents, user_query)
+    end
+
+    def load_all_oses_in_descending_order(os_descendents, user_query = nil)
       os_descendents.reverse_each do |os|
-        load_for_os(os)
+        load_for_os(os, user_query)
       end
     end
 
-    def load_for_os(operating_system)
+    def load_for_os(operating_system, user_query = nil)
       # select only classes
       classes = ClassDiscoverer.instance.discover_classes(operating_system)
       classes.each do |class_name|
         fact_name = class_name::FACT_NAME
         # if fact is already loaded, skip it
+
+        next if user_query.instance_of?(String) && fact_name !~ /^#{user_query}/
+
         unless @facts.any? { |fact| fact.name == fact_name }
           type = class_name.const_defined?('TYPE') ? class_name::TYPE : :core
           load_fact(fact_name, class_name, type)
