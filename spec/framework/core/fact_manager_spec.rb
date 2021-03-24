@@ -48,12 +48,12 @@ describe Facter::FactManager do
       [
         instance_double(
           Facter::SearchedFact,
-          name: os, fact_class: os_klass, filter_tokens: [],
+          name: os, klass: os_klass, filter_tokens: [],
           user_query: '', type: :core
         ),
         instance_double(
           Facter::SearchedFact,
-          name: 'my_custom_fact', fact_class: nil,
+          name: 'my_custom_fact', klass: nil,
           filter_tokens: [], user_query: '', type: :custom
         )
       ]
@@ -87,7 +87,7 @@ describe Facter::FactManager do
         [
           instance_double(
             Facter::SearchedFact,
-            name: fact_name, fact_class: nil,
+            name: fact_name, klass: nil,
             filter_tokens: [], user_query: '', type: :custom
           )
         ]
@@ -213,7 +213,7 @@ describe Facter::FactManager do
         [
           instance_double(
             Facter::SearchedFact,
-            name: os, fact_class: os_klass, filter_tokens: [],
+            name: os, klass: os_klass, filter_tokens: [],
             user_query: '', type: :core
           )
         ]
@@ -331,7 +331,7 @@ describe Facter::FactManager do
     let(:searched_fact) do
       instance_double(
         Facter::SearchedFact,
-        name: 'os', fact_class: ubuntu_os_name,
+        name: 'os', klass: ubuntu_os_name,
         filter_tokens: [], user_query: '', type: :core
       )
     end
