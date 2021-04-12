@@ -23,10 +23,10 @@ def initialize_beaker
   beaker_platform_with_options = platform_with_options(beaker_platform)
 
   message('BEAKER INITIALIZE')
-  run("beaker init -h #{beaker_platform_with_options} -o #{File.join('config', 'aio', 'options.rb')}")
+  run("bundle exec beaker init -h #{beaker_platform_with_options} -o #{File.join('config', 'aio', 'options.rb')}")
 
   message('BEAKER PROVISION')
-  run('beaker provision')
+  run('bundle exec beaker provision')
 end
 
 def beaker_platform
@@ -41,7 +41,7 @@ def beaker_platform
 end
 
 def platform_with_options(platform)
-  return "\"#{platform}{hypervisor=none,hostname=localhost,is_cygwin=false}\"" if platform.include? 'windows'
+  return "\"#{platform}{hypervisor=none,hostname=localhost,is_cygwin=true}\"" if platform.include? 'windows'
 
   "#{platform}{hypervisor=none\\,hostname=localhost}"
 end
@@ -52,31 +52,31 @@ def install_puppet_agent
   beaker_puppet_root = run('bundle info beaker-puppet --path')
   presuite_file_path = File.join(beaker_puppet_root.chomp, 'setup', 'aio', '010_Install_Puppet_Agent.rb')
 
-  run("beaker exec pre-suite --pre-suite #{presuite_file_path} --preserve-state", './', env_path_var)
+  run("bundle exec beaker exec pre-suite --pre-suite #{presuite_file_path} --preserve-state", './', env_path_var)
 end
 
 def puppet_puppet_bin_dir
   return '/opt/puppetlabs/puppet/bin' unless HOST_PLATFORM.include? 'windows'
 
-  'C:\\Program Files\\Puppet Labs\\Puppet\\puppet\\bin'
+  '"C:\\Program Files\\Puppet Labs\\Puppet\\puppet\\bin"'
 end
 
 def puppet_bin_dir
   return '/opt/puppetlabs/puppet/bin' unless HOST_PLATFORM.include? 'windows'
 
-  'C:\\Program Files\\Puppet Labs\\Puppet\\bin'
+  '"C:\\Program Files\\Puppet Labs\\Puppet\\bin"'
 end
 
 def puppet_ruby
   return '/opt/puppetlabs/puppet/bin/ruby' unless HOST_PLATFORM.include? 'windows'
 
-  'C:\\Program Files\\Puppet Labs\\Puppet\\puppet\\bin\\ruby.exe'
+  "#{puppet_puppet_bin_dir}/ruby.exe"
 end
 
 def facter_lib_path
   return '/opt/puppetlabs/puppet/lib/ruby/vendor_ruby/facter' unless HOST_PLATFORM.include? 'windows'
 
-  'C:\\Program Files\\Puppet Labs\\Puppet\\puppet\\lib\\ruby\\vendor_ruby\\facter'
+  '"C:\\Program Files\\Puppet Labs\\Puppet\\puppet\\lib\\ruby\\vendor_ruby\\facter"'
 end
 
 def env_path_var
@@ -87,19 +87,18 @@ def install_facter
   message('OVERWRITE FACTER FROM PUPPET AGENT')
 
   # clean facter directory
-  FileUtils.rm_r(facter_lib_path)
-  FileUtils.mkdir(facter_lib_path)
+  # FileUtils.rm_r(facter_lib_path)
+  # FileUtils.mkdir(facter_lib_path)
 
   Dir.chdir('../') do
-    run("\'#{puppet_ruby}\' install.rb --bindir=\'#{puppet_puppet_bin_dir}\' " \
-    "--sitelibdir=\'#{facter_lib_path.gsub('facter', '')}\'")
+    `"#{puppet_ruby}" install.rb --bindir="#{puppet_puppet_bin_dir}" --sitelibdir="#{facter_lib_path.gsub('facter', '')}"`
   end
 end
 
 def run_acceptance_tests
   message('RUN ACCEPTANCE TESTS')
 
-  run('beaker exec tests --test-tag-exclude=server,facter_3 --test-tag-or=risk:high,audit:high', './', env_path_var)
+  run('bundle exec beaker exec tests --test-tag-exclude=server,facter_3 --test-tag-or=risk:high,audit:high', './', env_path_var)
 end
 
 def message(message)

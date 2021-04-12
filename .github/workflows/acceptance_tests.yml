@@ -14,7 +14,7 @@ jobs:
     name: Platform
     strategy:
       matrix:
-        os: [windows-2016, windows-2019, ubuntu-16.04, ubuntu-18.04, ubuntu-20.04, macos-10.15]
+        os: [windows-2016]
     runs-on: ${{ matrix.os }}
     env:
       BEAKER_debug: true
@@ -60,6 +60,21 @@ jobs:
         if: runner.os != 'Windows'
         run: sudo -E "PATH=$PATH" ruby $FACTER_ROOT/.github/actions/presuite.rb ${{ matrix.os }}
 
+      - name: Set up Cygwin
+        uses: egor-tensin/setup-cygwin@v3
+        with:
+          platform: x64
+
+      - name: set path
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          set PATH="C:\\Program Files\\Puppet Labs\\Puppet\\bin\";%PATH%
+
       - name: Run acceptance tests on Windows like platform
         if: runner.os == 'Windows'
-        run: ruby $Env:FACTER_ROOT/.github/actions/presuite.rb ${{ matrix.os }}
+        shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
+        run: |
+          echo 'export PATH="/cygdrive/c/Program Files/Puppet Labs/Puppet/bin":$PATH' > /etc/bash.bashrc
+          export FACTER_ROOT=D:/a/facter/facter/facter
+          C:/hostedtoolcache/windows/Ruby/2.6.6/x64/bin/ruby.exe $FACTER_ROOT/.github/actions/presuite.rb ${{ matrix.os }}
